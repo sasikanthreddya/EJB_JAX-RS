@@ -1,0 +1,215 @@
+package com.otml.test;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+
+import com.otml.entities.RequestProcess;
+import com.otml.entities.Technician;
+import com.otml.utils.HibernateUtil;
+
+public class OTMLTest {
+public static void main(String[] args) {
+	SessionFactory sFactory=null;
+	Session session=null;
+	Transaction transaction=null;
+	RequestProcess rp1=null;
+	RequestProcess rp2=null; 
+	RequestProcess rp3=null;
+	RequestProcess rp4=null;
+	Technician technician1=null;
+	Technician technician2=null;
+	List<RequestProcess> rs1=null;
+	List<RequestProcess> rs2=null;
+	
+		boolean flag=false;
+	try{
+		sFactory=HibernateUtil.getSessionFactory();
+		session=sFactory.getCurrentSession();
+		transaction=session.beginTransaction(); 
+		//technician1= (Technician) session.get(Technician.class, 1);
+		/*rp1=(RequestProcess) session.get(RequestProcess.class, 2);
+		RequestProcess changed=new RequestProcess();
+		   changed.setDescription("bad custmercare servicres in motoroloa");
+		   session.save(changed);
+		*///rp1=new RequestProcess(description, assignDate, eta);
+		/*rp1=getRequestProcess("samsung galaxy blast", new Date(), new Date(2017, 03, 07));
+		rp2=getRequestProcess("lenovo bettery down", new Date(), new Date(2017, 03, 06));
+		rp3=getRequestProcess("oppo selifi not working", new Date(), new Date(2017, 03, 10));
+		rp4=getRequestProcess("motog voer heating", new Date(), new Date(2017, 03, 07));
+		session.save(rp1);
+		session.save(rp2);
+		session.save(rp3);
+		session.save(rp4);
+		
+		rs1=new ArrayList<RequestProcess>();
+		rs1.add(rp1);
+		rs1.add(rp3);
+		
+		rs2=new ArrayList<RequestProcess>();
+		rs2.add(rp2);
+		rs2.add(rp4);
+		
+		technician1=getTechnician("gopi", "engineer",7889048449l, "gopi.sr@gamil.com");
+		technician2=getTechnician("sasi", "engineer",9848022898l, "sasi.sr@gamil.com");
+		technician1.setRequestProcesses(rs1);
+		technician2.setRequestProcesses(rs2);
+		session.save(technician1);
+		session.save(technician2);*/
+		/*technician1.setRequestProcesses(rs1);
+		technician2.setRequestProcesses(rs2);*/
+		//getTechnicianByName(session, 2);
+		//gettechnicianMobileNoBynameAndDesignation(session, "david", "engineer");
+		//updateETechnicianByid(session, 7852145876l,"mobile repaie expert", 2);
+		//findRequestProcessinAssignByTechnicianName(session, 3);
+	//findhighestRequstAssignedTechnicianNo(session);
+		//getTotalNofTechniciansByTheirDesignination(session);
+		//getAllechnicainDeailsHavingrp(session);
+		findTechnicianByRequestProcessNumber(session, 2);
+		//findNameAndDesignationOfTechnicain(session);
+				flag=true;
+	
+	}finally{
+		if(transaction!=null){
+			if(flag){
+				transaction.commit();
+			}else{
+				transaction.rollback();
+			}		
+	}
+		
+
+	}}
+
+private static void updateETechnicianByid(Session session,Long contectNo,String desination,int techinicianId){
+Query query=null;
+query=session.createQuery("update Technician t set t.contactNo=?,t.designation=? where t.techinicianNo=?");
+ query.setParameter(0,contectNo);
+ query.setParameter(1,desination);
+ query.setParameter(2,techinicianId);
+/*List<String> names= query.list();*/
+int status= query.executeUpdate();
+System.out.println(status);
+}
+private static void findNameAndDesignationOfTechnicain(Session session){
+	Projection projetion=Projections.projectionList().add(Projections.property("name")).add(Projections.property("designation"));
+	Criteria criteria=session.createCriteria(Technician.class).setProjection(projetion);
+	List<Object[]> objects=criteria.list();
+	for(Object[] row:objects){
+	    System.out.println("name of the technician is"+row[0]+" designation is"+row[1]);
+}
+}
+private static void findTechnicianByRequestProcessNumber(Session session,int requestNo){
+	Criteria criteria=session.createCriteria(Technician.class).createAlias("requestProcesses","rp",JoinType.INNER_JOIN).add(Restrictions.like("rp.requestNo", requestNo));
+	List<Technician> technicians=criteria.list();
+	 for(Technician technician:technicians){
+	System.out.println(technician.getName());
+	}
+    /* for(String tceName:techNames){
+   	  System.out.println(tceName);*/
+     
+	/* List<Technician> technicians= criteria.list();
+      for(Technician technician:technicians){
+     	 System.out.println(technician.getContactNo());}*/
+	
+}
+//get emplyee by using where conditinal operator
+private static void getTechnicianByName(Session session,int empId){
+/*	Query query=null;
+	query=session.createQuery("select t.name from Technician t where t.techinicianNo=?");
+	  query.setParameter(0,empId);
+	 List<String> names= query.list();
+	*/
+	Criteria getEmpName=session.createCriteria(Technician.class).add(Restrictions.like("techinicianNo", empId));
+	
+	//List<Technician> names= getEmpName.list();
+	  List<Object> names= getEmpName.list();
+	     for(Object name:names){
+		  System.out.println(name);
+	 }
+	 /* List<Technician> technicians=query.list();
+	  for(Technician technician:technicians){
+		  System.out.println(technician.getName());
+	  }*/
+
+}
+//update  emplyee by id
+private static void gettechnicianMobileNoBynameAndDesignation(Session session,String name,String designation){
+	  Criteria criteria=session.createCriteria(Technician.class).add(Restrictions.ilike("name", name)).add(Restrictions.ilike("designation", designation));
+       List<Technician> technicians= criteria.list();
+       for(Technician technician:technicians){
+      	 System.out.println(technician.getContactNo());
+       }
+}
+private static void getAllechnicainDeailsHavingrp(Session session){
+	//criteria
+	Criteria criteria=session.createCriteria(Technician.class).createAlias("requestProcesses","rp",JoinType.INNER_JOIN);
+	 List<String>techNames=criteria.list();
+     for(String tceName:techNames){
+   	  System.out.println(tceName);
+     }
+}
+private static void getTotalNofTechniciansByTheirDesignination(Session session){
+	//hql
+	Query query=session.createQuery("select count(t.techinicianNo),t.designation from Technician t");
+	List<Object[]> data = query.list();
+	for (Object[] row : data) {
+		System.out.println("TOTAL NO.F TECHNICIANS : " + row[0]
+				+ " DESIGNINATION : " + row[1]);
+	}
+}
+    private static void findhighestRequstAssignedTechnicianNo(Session session){
+    	 Query query=null;
+query=session.createQuery("select t.name from Technician t inner join  t.requestProcesses rp where rp.requestNo >=(Select r.requestNo from requestProcesses r where r.requestNo=1)");
+ 	//query=session.createQuery("select t.name from Technician t inner join t.requestProcesses rp >(select count(max(rp.requestNo)) groupBy rp.requestNo)")>(Select avg(rp.requestNo)  from requestProcesses rp );
+    	 List<String>techNames=query.list();
+      for(String tceName:techNames){
+    	  System.out.println(tceName);
+      }
+    }
+    //innerJoin
+ //1)   
+  private static void findRequestProcessinAssignByTechnicianName(Session session,int requestNo){
+	  Query query=null;
+	  query=session.createQuery("select t.name from Technician t inner join t.requestProcesses rp where rp.requestNo=:requestNo");
+      query.setParameter("requestNo", requestNo);
+      List<String>techNames=query.list();
+      for(String tceName:techNames){
+    	  System.out.println(tceName);
+    	  
+      }
+  } 
+
+       private static  Technician getTechnician(String name,String designation,long contactNo,String emailNo){
+    	         Technician technician=null;
+    	      technician=new Technician();
+    	      technician.setName(name);
+    	      technician.setDesignation(designation);
+    	     technician.setContactNo(contactNo);
+    	      technician.setEmailNo(emailNo);    
+    	      return technician;
+         }	
+       private static RequestProcess getRequestProcess(String description,Date assignDate,Date eta){
+    	   RequestProcess requestProcess=null;
+    	   requestProcess=new RequestProcess();
+    	   requestProcess.setDescription(description);
+    	   requestProcess.setAssignDate(assignDate);
+    	   requestProcess.setEta(eta);
+    	   return requestProcess;
+    	   
+       }
+
+}
+
